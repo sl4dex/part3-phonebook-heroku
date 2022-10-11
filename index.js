@@ -3,12 +3,12 @@ const morgan = require('morgan')
 const cors = require('cors')
 
 const app = express()
-//
 // very important so express can use json parser for POST
 app.use(express.json())
-
+// allows backend in port 3001 to communicate with frontend in port 3000
 app.use(cors())
-
+// after every GET request, express will verify if build has the requested file
+app.use(express.static('build'))
 
 let persons = [
     {
