@@ -1,5 +1,5 @@
 
-const getPersonById = (people, request, response) => {
+const getPersonById = (people, request, response, next) => {
     people.findById(request.params.id)
         .then(p => {
             if (p)
@@ -7,9 +7,7 @@ const getPersonById = (people, request, response) => {
             else
                 return response.status(404).end()
         })
-        .catch(error => {
-            response.status(400).send({ error: 'maformatted id' })
-        })
+        .catch(error => next(error)) // calls custom errorHandler() in index.js
 }
 
 const addPerson = (people, request, response) => {
@@ -28,4 +26,21 @@ const addPerson = (people, request, response) => {
     person.save().then(savedp => response.json(savedp))
 }
 
-module.exports = { getPersonById, addPerson}
+const delPerson = (people, request, response, next) => {
+    people.findByIdAndRemove(request.params.id)
+        .then(result => response.status(204).end())
+        .catch(error => next(error))
+}
+
+const updatePerson = (people, request, response, next) => {
+    const person = {
+        name: request.body.name,
+        num: request.body.num
+    }
+    people.findByIdAndUpdate(request.params.id, person, {new: true})
+        .then(updatedPerson => response.json(updatedPerson))
+        .catch(error => next(error))
+}
+
+
+module.exports = { getPersonById, addPerson, delPerson, updatePerson}

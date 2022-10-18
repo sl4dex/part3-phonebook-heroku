@@ -26,30 +26,45 @@ app.get('/', (request, response) => {
   response.send('<h1>Hello World!</h1>')
 })
 
+app.get('/api/info', (request, response) => {
+  var currentTime = new Date();
+  response.send(`<p>phonebook has info for ${persons.length} people</p> ${currentTime}`)
+})
+
 app.get('/api/persons', (request, response) => {
   Person.find({}).then(persons => response.json(persons))
 })
 
 // using express two dot notation, :id will be an arbitrary string, accesed by request.params.id
-app.get('/api/persons/:id', (request, response) => {
-  personCrud.getPersonById(Person, request, response)
-})
-
-app.delete('/api/persons/:id', (request, response) => {
-  const id = Number(request.params.id)
-  persons = persons.filter(elem => elem.id !== id)
-
-  response.status(204).end()
+app.get('/api/persons/:id', (request, response, next) => {
+  personCrud.getPersonById(Person, request, response, next)
 })
 
 app.post('/api/persons', (request, response) => {
   personCrud.addPerson(Person, request, response)
 })
 
-app.get('/api/info', (request, response) => {
-  var currentTime = new Date();
-  response.send(`<p>phonebook has info for ${persons.length} people</p> ${currentTime}`)
+app.delete('/api/persons/:id', (request, response, next) => {
+  personCrud.delPerson(Person, request, response, next)
 })
+
+app.put('/api/persons/:id', (request, response, next) => {
+  personCrud.updatePerson(Person, request, response, next)
+})
+
+// error handler
+const errorHandler = (error, request, response, next) => {
+  console.error(error.message)
+
+  if (error.name === 'CastError') {
+    return response.status(400).send({ error: 'malformatted id' })
+  } 
+
+  // else, handle it with node's default error handler
+  next(error)
+}
+
+app.use(errorHandler)
 
 const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
