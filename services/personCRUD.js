@@ -22,7 +22,7 @@ const addPerson = (Person, request, response, next) => {
     num: per.num
   })
 
-  // .save() is an asynchronous function, so you can use for example a .then()
+  // .save() is an asynchronous function, so you can use for example .then()
   // we use .json beacause its json notation
   person.save()
     .then(savedp => response.json(savedp.toJSON()))
