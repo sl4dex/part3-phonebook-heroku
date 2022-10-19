@@ -27,8 +27,8 @@ app.get('/', (request, response) => {
 })
 
 app.get('/api/info', (request, response) => {
-  var currentTime = new Date();
-  response.send(`<p>phonebook has info for ${persons.length} people</p> ${currentTime}`)
+  var currentTime = new Date()
+  response.send(`<p>phonebook has info for ${Person.length} people</p> ${currentTime}`)
 })
 
 app.get('/api/persons', (request, response) => {
