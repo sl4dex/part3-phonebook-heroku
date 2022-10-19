@@ -10,7 +10,7 @@ app.use(cors())
 // after every GET request, express will verify if build has the requested file
 app.use(express.static('build'))
 
-// modelo de Person mongodb
+// mongoose model Person
 const Person = require('./models/person')
 
 // modulo (archivo) con las operaciones crud de mongodb
@@ -40,8 +40,8 @@ app.get('/api/persons/:id', (request, response, next) => {
   personCrud.getPersonById(Person, request, response, next)
 })
 
-app.post('/api/persons', (request, response) => {
-  personCrud.addPerson(Person, request, response)
+app.post('/api/persons', (request, response, next) => {
+  personCrud.addPerson(Person, request, response, next)
 })
 
 app.delete('/api/persons/:id', (request, response, next) => {
@@ -58,7 +58,10 @@ const errorHandler = (error, request, response, next) => {
 
   if (error.name === 'CastError') {
     return response.status(400).send({ error: 'malformatted id' })
-  } 
+  }
+  else if (error.name === 'ValidationError') {
+    return response.status(400).json({ error: error.message })
+  }
 
   // else, handle it with node's default error handler
   next(error)
